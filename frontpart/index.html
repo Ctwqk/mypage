@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiwei Cui</title>
+    <style>
+        h1 {
+            text-align: center; /* 文本居中 */
+        }
+        nav {
+            text-align: center; /* 居中导航栏 */
+            background-color: #f8f8f8;
+            padding: 10px 0;
+        }
+        nav ul {
+            margin: 0;
+            padding: 0;
+            list-style: none; /* 去掉列表样式 */
+        }
+        nav ul li {
+            display: inline-block; /* 水平排列 */
+            margin: 0 15px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+        nav ul li a:hover {
+            color: #0078ff; /* 悬浮效果 */
+        }
+        .container {
+            display: flex;
+            justify-content: center; /* 居中整个内容 */
+            gap: 20px; /* 左中右之间的间隔 */
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+        .side-images {
+            display: flex;
+            flex-direction: column; /* 竖直排列 */
+            align-items: center;
+            gap: 15px; /* 图片之间的间隔 */
+        }
+        .side-images img {
+            width: 50px; /* 图片大小 */
+            height: 50px;
+        }
+        .content {
+            flex-grow: 1; /* 中间内容占据剩余空间 */
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1> </h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="aboutme/resume.html">CV</a></li>
+            <li><a href="projects/index.html">Projects</a></li>
+            <!-- <li><a href="publications/index.html">Publications</a></li> -->
+            <li><a href="contact/index.html">Contact</a></li>
+            <li><a href="deepseek_/index.html">Chat Robot</a></li>
+            <!-- <li><a href="aboutme/mylife.html">My life</a></li> -->
+        </ul>
+    </nav>
+    <div class="container">
+        <!-- 左侧图片 -->
+        <!-- <div class="side-images">
+            <img src="image1.png" alt="Left Image">
+            <img src="image2.png" alt="Left Image">
+            <img src="image3.png" alt="Left Image">
+        </div> -->
+
+        <!-- 中间内容 -->
+        <div class="content">
+            <h1>Taiwei Cui</h1>
+            <p>Is M.S. CS in Northeastern University</p>
+            <p>Was B.S. CS in Nanjing Agricultural University</p>
+            <p>Looking for intern or fulltime</p>
+        </div>
+
+        <!-- 右侧图片 -->
+        <!-- <div class="side-images">
+            <img src="image4.png" alt="Right Image">
+            <img src="image5.png" alt="Right Image">
+            <img src="image6.png" alt="Right Image">
+        </div> -->
+    </div>
+</body>
+</html>

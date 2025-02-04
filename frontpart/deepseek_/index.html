@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Font Awesome for the sidebar toggle icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Chat with Ollama</title>
+  <style>
+    /* Basic reset and background */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background-image: url('C2.jpg'); /* Replace with your image URL */
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    /* Sidebar styles */
+    #sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 250px;
+      background-color: rgba(51, 49, 49, 0.8);
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 100;
+      transform: translateX(0);
+    }
+    #sidebar.hidden {
+      transform: translateX(-100%);
+    }
+    #sidebar.slide-right {
+      transform: translateX(20px);
+    }
+    /* Main chat area fixed on the right */
+    #main {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 270px; /* offset for sidebar */
+      padding: 20px;
+      background-color: rgba(51, 49, 49, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: left 0.3s ease;
+    }
+    #main.expanded {
+      left: 0;
+    }
+    /* Model selector positioned absolutely so it doesn't take up flex space */
+    /* #model-selector {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 10;
+      text-align: center;
+    }
+    #model-selector label {
+      color: #fff;
+      font-size: 1.2em;
+      display: block;
+      margin-bottom: 5px;
+    } */
+    #modelSelect {
+      text-align: center;
+      background: rgba(51, 49, 49, 0.8);
+      border: none;
+      border-radius: 4px;
+      width: auto;
+      font-size: 2em;
+      color: #fff;
+      padding: 5px 10px;
+      -webkit-appearance: none; /* Remove default styling in WebKit browsers */
+      -moz-appearance: none;    /* Remove default styling in Firefox */
+      appearance: none;         /* Remove default styling */
+    }
+    #modelSelect:focus {
+      background-color: rgba(51, 49, 49, 0.8);
+      outline: none;
+    }
+    #modelSelect option {
+      background-color: rgba(51, 49, 49, 0.8);
+      color: #fff;
+    }
+    /* Chat container fills the main area (with top offset for the model selector) */
+    #chat-container {
+      margin-top: 0px; /* leave enough space for the model selector */
+      height: calc(100%);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    /* Chatbox scrolls if content overflows */
+    #chatbox {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background-color: rgba(51, 49, 49, 0.8);
+      color:#d1c9c9;
+    }
+    /* Input area remains at the bottom of chat container */
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+      background: rgba(51, 49, 49, 0.8);
+      color:#d1c9c9;
+    }
+    #userInput {
+      flex-grow: 1;
+      background: rgba(51, 49, 49, 0.8);
+      border: none;
+      padding: 10px;
+      font-size: 1em;
+      color: #fff;
+      resize: vertical;
+    }
+    #userInput:focus{
+      outline:none;
+    }
+    #sendButton {
+      background: #3f6d83;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    #sendButton:hover {
+      background: #e60000;
+    }
+    .think-text {
+      font-style: italic;
+      color: gray;
+      font-family: "Courier New", monospace;
+    }
+    /* Session list styles (unchanged) */
+    .session-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background-color: rgba(51, 49, 49, 0.8);
+      padding: 10px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .session-container:hover {
+      background: rgba(80, 78, 78, 0.8);
+    }
+    .session-name {
+      flex-grow: 1;
+      text-align: left;
+      font-size: 1.1em;
+      color: #fff;
+    }
+    .delete-button {
+      background: #ff4d4d;
+      border: none;
+      color: white;
+      padding: 5px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .delete-button:hover {
+      background: #e60000;
+    }
+    /* Toggle sidebar button */
+    #toggleSidebar {
+      background: transparent;
+      color: #d1c9c9;
+      border: none;
+      outline: none;
+      position: fixed;
+      top: 10px;
+      left: 220px;
+      z-index: 101;
+      transition: transform 0.3s ease;
+      font-size: 30px;
+    }
+    #toggleSidebar.hidden {
+      transform: translateX(-200px);
+    }
+    .new-session-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80%;
+      background-color: rgba(51, 49, 49, 0.8);
+      padding: 10px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      box-sizing: border-box;
+      font-size: 1.1em;
+      color: #fff;
+    }
+    .new-session-button:hover {
+      background: rgba(80, 78, 78, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <!-- Toggle sidebar button -->
+  <button id="toggleSidebar" aria-label="Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <button class="new-session-button" onclick="createSession()">New Session</button>
+    <div id="session-list"></div>
+  </div>
+  <!-- Main Chat Area (fixed) -->
+  <div id="main">
+    <!-- Dropdown model selector positioned absolutely -->
+    <!-- <div id="model-selector">
+      
+    </div> -->
+    <!-- Chat container now fills the main area (minus top offset) -->
+    <div id="chat-container">
+      <select id="modelSelect" data-placeholder="true"> nlp chat model</select>
+      <div id="chatbox"></div>
+      <div id="input-area">
+        <textarea id="userInput" placeholder="Type your message here..." rows="4"></textarea>
+        <button id="sendButton" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    // JavaScript functionality remains largely unchanged
+    let currentSessionId = null;
+    let conversationHistory = [];
+
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+      const sidebar = document.getElementById('sidebar');
+      const main = document.getElementById('main');
+      if (!sidebar.classList.contains('hidden')) {
+        setTimeout(() => {
+          sidebar.classList.remove('slide-right');
+          sidebar.classList.add('hidden');
+          this.style.transform = "translateX(-210px)";
+          main.classList.add('expanded');
+        });
+      } else {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('slide-right');
+        this.style.transform = "translateX(20px)";
+        setTimeout(() => {
+          sidebar.classList.remove('slide-right');
+          this.style.transform = "";
+          main.classList.remove('expanded');
+        });
+      }
+    });
+
+    async function loadModels() {
+      try {
+        // Replace the URL below with your actual models endpoint
+        const response = await fetch("/deepseek/api/tags");
+        const data = await response.json();
+        const modelNames = data.models.map(model => model.id || model.name);
+        const modelSelect = document.getElementById("modelSelect");
+        modelSelect.innerHTML = "";
+        modelNames.forEach(name => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.text = name;
+          modelSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error loading models:", error);
+      }
+    }
+
+    async function createSession(){
+      const response = await fetch("/deepseek_backend/create_session", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_name: "New Chat" })
+      });
+      const session = await response.json();
+      currentSessionId = session.session_id;
+      addSessionToList(session);
+      document.getElementById("chatbox").innerHTML = "";
+    }
+
+    function addSessionToList(session) {
+      const sessionList = document.getElementById("session-list");
+      const container = document.createElement("div");
+      container.classList.add("session-container");
+      container.setAttribute("data-session-id", session.session_id);
+      container.onclick = () => switchSession(session.session_id);
+      const nameSpan = document.createElement("span");
+      nameSpan.classList.add("session-name");
+      nameSpan.innerText = session.session_name;
+      const deleteButton = document.createElement("button");
+      deleteButton.classList.add("delete-button");
+      deleteButton.innerText = "Delete";
+      deleteButton.onclick = (e) => {
+        e.stopPropagation();
+        deleteSession(session.session_id);
+        container.remove();
+      };
+      container.appendChild(nameSpan);
+      container.appendChild(deleteButton);
+      sessionList.appendChild(container);
+    }
+
+    async function loadSessions(){
+      const response = await fetch("/deepseek_backend/get_session");
+      const sessions = await response.json();
+      const sessionList = document.getElementById("session-list");
+      sessionList.innerHTML = "";  
+      sessions.forEach(session => {
+        addSessionToList(session);
+      });
+    }
+    
+    async function switchSession(sessionId) {
+      currentSessionId = sessionId;
+      await loadChatHistory(sessionId);
+    }
+
+    async function deleteSession(sessionId = null){
+      const idToDelete = sessionId ? sessionId : currentSessionId;
+      const chatbox = document.getElementById("chatbox");
+      chatbox.innerHTML = "";
+      await fetch('/deepseek_backend/delete_session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: idToDelete })
+      });
+      loadSessions();
+    }
+
+    async function loadChatHistory(sessionId){
+      const response = await fetch(`/deepseek_backend/load_chat/${sessionId}`);
+      let messages = await response.json();
+      const chatbox = document.getElementById("chatbox");
+      chatbox.innerHTML = "";
+      messages = messages.reverse();
+      messages.forEach(msg => {
+        chatbox.innerHTML += `<div><strong>${msg.role === "user" ? "You" : "Robot"}:</strong> ${msg.content}</div>`;
+      });
+      conversationHistory = messages;
+      chatbox.scrollTop = chatbox.scrollHeight;
+      let newSessionName = await computeSessionName(messages);
+      updateSessionName(sessionId, newSessionName);
+    }
+
+    async function computeSessionName(messages) {
+      if (messages.length > 0) {
+        for (let msg of messages) {
+          if (msg.content && msg.content.trim() !== "") {
+            const response = await fetch('/deepseek/api/generate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: "deepseek-llm:7b",
+                prompt: `Summarize the following content in no more than 5 words, less is better:\n\n${msg.content}`,
+                stream: false
+              })
+            });
+            const data = await response.json();
+            // console.log(data.response);
+            return data.response.substring(0,30);   
+          }
+        }
+      }
+      return "New Chat";
+    }
+
+    function updateSessionName(sessionId, newName) {
+      const sessionList = document.getElementById("session-list");
+      const container = sessionList.querySelector(`[data-session-id="${sessionId}"]`);
+      if (container) {
+        const nameSpan = container.querySelector(".session-name");
+        if (nameSpan) {
+          nameSpan.innerText = newName;
+        }
+      }
+    }
+
+    function formatThinkText(text) {
+      return text.replace(/<think>([\s\S]*?)<\/think>/g, '<span class="think-text">$1</span>');
+    }
+
+    async function sendMessage() {
+      if (!currentSessionId) {
+        alert("Please select or create a session first.");
+        return;
+      }
+      const userInputElem = document.getElementById('userInput');
+      const userInput = userInputElem.value;
+      const chatbox = document.getElementById('chatbox');
+      userInputElem.innerHTML = "";
+      chatbox.innerHTML += `<div><strong>You:</strong> ${userInput}</div>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
+      
+      conversationHistory.push({ role: "user", content: userInput });
+      const recentHistory = conversationHistory.slice(-10);
+      
+      // Use the selected model from the dropdown
+      const selectedModel = document.getElementById("modelSelect").value;
+      console.log(selectedModel);
+
+      const responseDiv = document.createElement("div");
+      responseDiv.innerHTML = `<strong>Robot:</strong> <span class="streaming-response"></span>`;
+      chatbox.appendChild(responseDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      try {
+        const response = await fetch('/deepseek/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: selectedModel,
+            messages: recentHistory,
+            stream: true
+          })
+        });
+
+        if (!response.body) throw new Error("No response body from server.");
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedResponse = "";
+        let buffer = "";
+        const responseSpan = document.querySelectorAll(".streaming-response");
+        const latestResponseSpan = responseSpan[responseSpan.length - 1];
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let boundary = buffer.indexOf("\n");
+          while (boundary !== -1) {
+            let jsonChunk = buffer.slice(0, boundary).trim();
+            buffer = buffer.slice(boundary + 1);
+            boundary = buffer.indexOf("\n");
+            if (jsonChunk) {
+              try {
+                const parsedChunk = JSON.parse(jsonChunk);
+                if (parsedChunk.message && parsedChunk.message.content) {
+                  let chunkText = parsedChunk.message.content;
+                  chunkText = formatThinkText(chunkText);
+                  accumulatedResponse += chunkText;
+                  latestResponseSpan.innerHTML = accumulatedResponse;
+                  chatbox.scrollTop = chatbox.scrollHeight;
+                }
+              } catch (e) {
+                console.error("Error parsing chunk:", e);
+              }
+            }
+          }
+        }
+        conversationHistory.push({ role: "assistant", content: accumulatedResponse });
+        await fetch("/deepseek_backend/save_chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: currentSessionId,
+            user: userInput,
+            assistant: accumulatedResponse
+          })
+        });
+      } catch (error) {
+        chatbox.innerHTML += `<div><strong>Error:</strong> ${error.message}</div>`;
+      }
+      userInputElem.value = '';
+    }
+    async function init(){
+      await loadSessions();
+      loadModels();
+      const sessionList = document.getElementById("session-list");
+      currentSessionId = sessionList.children[0].getAttribute("data-session-id");
+      if(currentSessionId){
+        loadChatHistory(currentSessionId);
+      }
+    }
+    window.onload = function(){
+      init()
+    }
+  </script>
+</body>
+</html>
