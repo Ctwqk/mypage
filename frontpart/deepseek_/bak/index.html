@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Link to external CSS file -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>Chat with Ollama</title>
+</head>
+<body>
+  <!-- Toggle sidebar button -->
+  <button id="toggleSidebar" aria-label="Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <button class="new-session-button" onclick="createSession()">New Session</button>
+    <div id="session-list"></div>
+  </div>
+  <!-- Main Chat Area (fixed) -->
+  <div id="main">
+    <!-- Model selector positioned absolutely -->
+    <div id="model-selector">
+      <select id="modelSelect" data-placeholder="true"> nlp chat model</select>
+    </div>
+    <!-- Chat container fills the remaining area -->
+    <div id="chat-container">
+      <div id="chatbox"></div>
+      <div id="input-area">
+        <textarea id="userInput" placeholder="Type your message here..." rows="4"></textarea>
+        <!-- Upload Image Button -->
+        <button id="uploadButton" title="Upload Image">
+          <i class="fas fa-image"></i>
+        </button>
+        <button id="sendButton" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+  <!-- Hidden file input for image upload -->
+  <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+  <!-- Link to external JavaScript file -->
+  <script src="script.js"></script>
+</body>
+</html>
