@@ -1,0 +1,225 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiwei Cui Resume</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 800px;
+            background-color: #f9f9f9;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .section-title {
+            border-bottom: 2px solid #0078ff;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin-bottom: 10px;
+        }
+        .contact-info, .project-links {
+            color: #0078ff;
+        }
+        .skills, .projects, .education {
+            margin-top: 10px;
+        }
+        .skills li {
+            display: inline-block;
+            background-color: #e0e0e0;
+            margin: 5px 5px 5px 0;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .github-link {
+            color: #0078ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Taiwei Cui</h1>
+        <p>San Jose, California | Phone: 408 593 5186 | Email: <a href="mailto:cui.ta@northeastern.edu" class="contact-info">cui.ta@northeastern.edu</a> | GitHub: <a href="https://github.com/Ctwqk" class="contact-info">https://github.com/Ctwqk</a></p>
+    </header>
+
+    <section class="education">
+        <h2 class="section-title">Education</h2>
+        <ul>
+            <li>
+                <strong>Northeastern University</strong>, Master of Computer Science (Expected Graduation: November 2025)<br>
+                Main Courses Taken: Programming Design Paradigm, Algorithm, Pattern Recognition & Computer Vision, Data Mining<br>
+                GPA: 4.0
+            </li>
+            <li>
+                <strong>Nanjing Agricultural University</strong>, Bachelor’s of Science – Information and Computing Science (Jun 2023)<br>
+                Honor: Second-class Merit Student<br>
+                GPA: 3.82
+            </li>
+        </ul>
+    </section>
+
+    <section class="projects">
+        <h2 class="section-title">Projects</h2>
+        <h3>Tiling Application in C++ (Aug 2024 - Nov 2024)</h3>
+        <p>Graphical Application: Developed a C++ application focusing on graphical tiling and pattern generation.<br>
+        Custom Modules: Designed and integrated multiple modules for image processing, user interaction, and entity handling.<br>
+        Cross-Platform Development: Built using CMake for streamlined building across platforms.<br>
+        Third-Party Libraries: Leveraged ImGui for user interface development and other external libraries for rendering and processing.<br>
+        Build Automation: Provided comprehensive build instructions for ease of use and replication.</p>
+        <a href="https://github.com/Ctwqk/onlineShopping/tree/taiwei" class="github-link">GitHub Project Link</a>
+
+        <h3>Online Shopping Platform in Java (Aug 2024 - Nov 2024)</h3>
+        <p>Back-End Development: Led the development of the back-end infrastructure.<br>
+        Spring Boot MVC: Utilized Spring Boot MVC to create a scalable server architecture.<br>
+        Image-Based Product Search using <strong>Amazon Rekognition API</strong>.<br>
+        Cloud Deployment on AWS (EC2, S3, RDS).<br>
+        Docker: Containerized the application and used Docker Compose.</p>
+        <a href="https://github.com/Ctwqk/onlineShopping/tree/taiwei" class="github-link">GitHub Project Link</a>
+
+        <h3>Sentiment Analysis of Customer Feedback for Airline Services (Mar 2024 - May 2024)</h3>
+        <p>Developed an LSTM model achieving 82% accuracy, improving 11% over baseline (Vader, 71%).<br>
+        Utilized Span-ASTE to enhance sentiment extraction.<br>
+        Built a regression model predicting customer ratings.</p>
+        <a href="https://github.com/Ctwqk/datamining" class="github-link">GitHub Project Link</a>
+
+        <h3>3D Snake Game Development in OpenCV C++ (Feb 2024 - Mar 2024)</h3>
+        <p>Developed a 3D snake game using computer vision techniques in OpenCV C++.<br>
+        Implemented camera calibration, real-time object detection, and SURF for optical tracking.</p>
+        <a href="https://github.com/Ctwqk/cvCodes/tree/main/projectFinal" class="github-link">GitHub Project Link</a>
+    </section>
+
+    <section class="research experience">
+        <h2 class="section-title">Research Experience</h2>
+    
+        <h3>The Study of Enhancing the Intelligibility of Speech Signals Based on Neural Network Models (Oct 2022 - Mar 2023)</h3>
+        <p>
+            Advisor: Professor Zhi Chen<br>
+            Conducted literature-based research on noise suppression algorithms and neural networks.<br>
+            Built the dataset of noisy signals with different signal-to-noise ratios using data from TIMIT and Noisex-92.<br>
+            Used various feature extraction methods to capture the features of noisy signals and trained models for noise suppression.<br>
+            Compared and selected the best feature extraction methods among Mel-frequency cepstral coefficients, Spectrogram, and log-power spectrum.<br>
+            Constructed neural network models and evaluated their suppression effects by comparing signal intelligibility, signal-to-noise ratios, and model complexity.
+        </p>
+    
+        <h3>The Comparison Between Two DNN-Based Signal Suppression Methods (Feb 2022 - Mar 2022)</h3>
+        <p>
+            Advisor: Professor Thomas Sullivan<br>
+            Mixed speech signals with Gaussian noise to obtain noisy signals and used mapping and masking methods for denoising.<br>
+            Trained the model with noisy signals sampled at 16kHz and separated into 16-ms frames with 8-ms overlap.<br>
+            Computed Short-Time Fourier Transform in NumPy to extract features of time-domain signals, then imported these features into the neural network to predict Ideal Ratio Masking (IRM).<br>
+            Conducted inverse Fourier Transform to acquire time-domain signals.<br>
+            Compared the Perceptual Evaluation of Speech Quality (PESQ) of the processed audios to determine suppression effectiveness quantitatively.
+        </p>
+    
+        <h3>The Study on the Semigroup Structure of Doubly Super-Stochastic Matrices (Mar 2021 - May 2022)</h3>
+        <p>
+            Advisor: Professors Zhi Chen and Tao Yang<br>
+            Conducted a literature review on doubly sub-stochastic matrices, exploring idempotence, Green’s relations, and other properties.<br>
+            Proposed properties of doubly super-stochastic matrices and their semigroup structure based on research findings.<br>
+            Proved theorems, including the idempotence of doubly super-stochastic matrices.<br>
+            As the team leader, organized offline meetings, assigned tasks, and oversaw the progress and outcome of report writing, PowerPoint preparation, and defense presentation.
+        </p>
+    </section>
+    
+
+    <section class="publication">
+        <h2 class="section-title">Publications</h2>
+        <ul>
+            <li>Peng Jin, Yuxuan Liu, Taiwei Cui. Gradient Penalty Cross Pseudo Supervision for Semi-Supervised Medical Image Segmentation. (ISBI 2025). Not published yet, to preview: <a href="http://10.0.0.136/publications/index.html" class="github-link">PDF Link</a>.</li>
+            <li>Cui, Taiwei. The compare between two DNN-based signal suppression methods. Proc. SPIE 12305, International Symposium on Artificial Intelligence Control and Application Technology (AICAT 2022). 123050T (23 August 2022);<a href="https://doi.org/10.1117/12.2645726" class="github-link">Article Link</a>  </li>
+        </ul>
+    </section>
+
+    <section class="work-experience">
+        <h2 class="section-title">Work Experience</h2>
+    
+        <h3>Teaching Assistant for CS5330 Computer Vision and Pattern Recognition (Sep 2024 – Dec 2024)</h3>
+        <p>
+            • Prepared OpenCV workshops to help students quickly get familiar with OpenCV.<br>
+            • Developed assignments on specific topics in computer vision, including recognition and GAI.
+        </p>
+    
+        <h3>Research Assistant of Professor Crane Chen in Computer Graphics (Dec 2024 – Now)</h3>
+        <p>
+            • Designed Toric Tiles for several tile pieces and implemented them using Python and C++.<br>
+            • Integrated a Tile-To-Image pipeline with ImGui.
+        </p>
+    
+        <h3>Haohui Network Development Company (May 2023 – Jul 2023)</h3>
+        <p>
+            • Developed and maintained controller and service modules for address management to ensure seamless CRUD operations.<br>
+            • Contributed to program development using Postman and JUnit 4.<br>
+            • Learned and applied SpringBoot and Redis in web development.
+        </p>
+    </section>
+    
+
+    <section class="skills">
+        <h2 class="section-title">Skills</h2>
+        <ul>
+            <li>Python</li>
+            <li>C++</li>
+            <li>Java</li>
+            <li>Spring Boot</li>
+            <li>Docker</li>
+            <li>AWS</li>
+            <li>Git</li>
+            <li>Jenkins</li>
+            <li>MySQL</li>
+            <li>PostgreSQL</li>
+            <li>MongoDB</li>
+            <li>RESTful APIs</li>
+            <li>Amazon Rekognition</li>
+            <li>OpenCV</li>
+            <li>OpenGL</li>
+        </ul>
+    </section>
+
+    <section class="activities">
+        <h2 class="section-title">Extracurricular Activities</h2>
+        <ul>
+            <li>Member of “Little Raindrops” Volunteer Team (Sep 2021-Nov 2021)</li>
+            <li>Violin Artist, Nanjing Agricultural University College Student Art Troupe (2019 - 2022)</li>
+            <li>Left Forward & Midfielder, College Soccer Team (2019 - 2023)</li>
+        </ul>
+    </section>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="Crane_sAcademicCV2024__Copy___Copy_.pdf"></iframe>
+</body>
+</html>

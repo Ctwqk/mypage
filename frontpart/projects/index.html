@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects</title>
+    <style>
+        /* 页面整体样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            text-align: center;
+            color: #333;
+        }
+
+        h1 {
+            margin: 20px 0;
+            font-size: 2.5rem;
+        }
+
+        /* 项目卡片样式 */
+        .project-card {
+            display: inline-block;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .project-card video {
+            width: 100%;
+            height: auto;
+        }
+
+        .project-card img {
+            width: 100%;
+            height: auto;
+        }
+
+        .project-details {
+            padding: 15px;
+        }
+
+        .project-details h2 {
+            margin: 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .project-links a {
+            display: inline-block;
+            margin: 10px;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #0078ff;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .project-links a:hover {
+            background-color: #005bb5;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Projects</h1>
+
+    <!-- 项目卡片 -->
+    <!-- <div class="project-card">
+        <img src="project1.jpg" alt="Project 1 Image">
+        <div class="project-details">
+            <h2>Online Shopping</h2>
+            <p>This is a project about online shopping and take out!</p>
+            <p>Java, Mysql, SpringBoot, Docker, Redis, Nginx</p>
+            <div class="project-links">
+                <a href="https://github.com/Ctwqk/onlineShopping/tree/taiwei" target="_blank">GitHub</a>
+                <a href="dist/index.html" target="_blank">Live Demo</a>
+            </div>
+            
+        </div>
+    </div> -->
+
+    <div class="project-card">
+        <video controls>
+            <source src="./Screencast from 01-24-2025 12:50:51 PM.webm" type="video/webm">
+            Your browser does not support the video tag.
+        </video>
+        <div class="project-details">
+            <h2>Tile the space</h2>
+            <p>Given a piece of tile, can you tile the space? (I can if you label the cone points for me)</p>
+            <p>C++, OpenCV, Eigen, IMGui</p>
+            <div class="project-links">
+                <a href="https://github.com/Ctwqk/TIleThePlain.git" target="_blank">GitHub</a>
+                <!--<a href="https://example.com/demo2" target="_blank">Live Demo</a>-->
+            </div>
+        </div>
+    </div>
+
+    <div class="project-card">
+        <video controls>
+            <source src="./demo_video_1.webm" type="video/webm">
+            Your browser does not support the video tag.
+        </video>
+        <div class="project-details">
+            <h2>OpenCv Course Codes</h2>
+            <p>OpenCV codes in 2024 spring, the final project is a 3D snake game! Its exciting!</p>
+            <p>C++, OpenCV</p>
+            <div class="project-links">
+                <a href="git@github.com:Ctwqk/cvCodes.git" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="project-card">
+        <img src="project3.jpg" alt="Project 3 Image">
+        <div class="project-details">
+            <h2>Evaluate Your Flight</h2>
+            <p>People rate the flight companies in different metrics(Their mind), how to evaluate flight fairly?</p>
+            <p>Python, LSTM, Span-ASTE</p>
+            <div class="project-links">
+                <a href="https://github.com/Ctwqk/datamining.git" target="_blank">GitHub</a>
+                <!--<a href="dist/index.html" target="_blank">Live Demo</a>-->
+            </div>
+            
+        </div>
+    </div>
+
+</body>
+</html>
