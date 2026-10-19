@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: backpart/DeepSeek/requirements*.txt
+      - name: Install dependencies
+        run: pip install -r backpart/DeepSeek/requirements-dev.txt
+      - name: Lint (ruff)
+        run: |
+          ruff check backpart scripts tests
+          ruff format --check backpart scripts tests
+      - name: Backend tests (LLM is mocked)
+        working-directory: backpart/DeepSeek
+        run: python -m pytest
+      - name: Site checker tests
+        run: python -m pytest tests
+
+  site:
+    name: Static site (lint + links + JS tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install Node dev dependencies
+        run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+      - name: HTML lint (html-validate)
+        run: npm run lint:html
+      - name: Local link and asset check
+        run: npm run check:links
+      - name: Chat helper unit tests
+        run: npm run test:js

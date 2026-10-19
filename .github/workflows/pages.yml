@@ -1,0 +1,36 @@
+# OPTIONAL: publishes the static part of the site (frontpart/) to GitHub Pages.
+#
+# This workflow is manual-only (workflow_dispatch) and does nothing until Pages is enabled for the
+# repository (Settings -> Pages -> Source: "GitHub Actions"). The chat page needs the Flask backend,
+# which Pages cannot run; there it shows a "backend not reachable" notice (or point the
+# <meta name="chat-api-root"> tag in frontpart/deepseek_/index.html at a hosted backend).
+name: Deploy static site to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check local links before publishing
+        run: python3 scripts/check_site.py frontpart
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontpart
+      - id: deployment
+        uses: actions/deploy-pages@v4

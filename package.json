@@ -1,0 +1,16 @@
+{
+  "name": "mypage",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal site (static pages) with a small Flask chat backend",
+  "scripts": {
+    "lint:html": "html-validate \"frontpart/**/*.html\"",
+    "check:links": "python3 scripts/check_site.py frontpart",
+    "test:js": "node --test \"tests/js/*.test.js\"",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "devDependencies": {
+    "html-validate": "^9.0.0",
+    "playwright": "1.57.0"
+  }
+}
