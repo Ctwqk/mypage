@@ -145,6 +145,7 @@ To regenerate the screenshots, start the server against a throwaway database and
 
 - **No authentication or per-user separation.** `user_id` is stored with a session but sessions are listed globally. The server binds to `127.0.0.1` by default; do not expose it to an untrusted network as is.
 - The Flask development server is used by `python server.py`; use a production WSGI server behind a reverse proxy for anything public. There is no rate limiting.
+- Image attachments need a vision-capable model; a text-only model makes the upstream reject the request and the chat shows that error (checked against Ollama with `qwen2.5:0.5b` and `moondream`).
 - Only the last 10 messages are sent to the model, and the last 10 turns are reloaded for a session.
 - Auto-generated titles depend on the model; very small models sometimes produce poor ones (a short fallback from the first words is used when the answer is too short).
 - Images are stored twice (database and disk). A cleaner design would keep files on disk and reference them from the database.
