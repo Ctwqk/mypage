@@ -27,7 +27,6 @@ const profiles = {
 const pages = [
   { name: "home", url: "/", fullPage: true },
   { name: "projects", url: "/projects/", fullPage: true },
-  { name: "contact", url: "/contact/", fullPage: true },
 ];
 
 for (const [profileName, profile] of Object.entries(profiles)) {
