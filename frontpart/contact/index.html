@@ -3,56 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Information</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-        .contact-info {
-            margin: 20px auto;
-            max-width: 600px;
-        }
-        .contact-info p {
-            font-size: 18px;
-            margin: 10px 0;
-        }
-        .contact-info a {
-            color: #007BFF;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .contact-info a:hover {
-            text-decoration: underline;
-        }
-        .wechat {
-            margin-top: 20px;
-        }
-        .wechat img {
-            max-width: 200px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-    </style>
+    <meta name="description" content="How to contact Taiwei Cui.">
+    <title>Contact | Taiwei Cui</title>
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../assets/site.css">
 </head>
 <body>
-    <h1>Contact Information</h1>
-    <div class="contact-info">
-        <p>Email: <a href="mailto:cui.ta@northeastern.edu">cui.ta@northeastern.edu</a></p>
-        <p>Email: <a href="mailto:taiwei293@gmail.com">taiwei293@gmail.com</a></p>
-        <p>Phone: 408-593-5186</p>
-        <!-- <p>Github: <a href = "https://github.com/Ctwqk"> Taiwei's github</a></p> -->
-        <!-- <p>LinkedIn: <a href="https://linkedin.com/in/your-profile" target="_blank">https://linkedin.com/in/your-profile</a></p> -->
-    </div>
-    <div class="wechat">
-        <p>WeChat: Scan the QR code below to connect on WeChat:</p>
-        <img src="wechat_QR.png" alt="WeChat QR Code">
-    </div>
+    <header class="site-header">
+        <a class="skip-link" href="#main">Skip to content</a>
+        <nav aria-label="Main">
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../aboutme/resume.html">CV</a></li>
+                <li><a href="../projects/index.html">Projects</a></li>
+                <li><a href="../publications/index.html">Publications</a></li>
+                <li><a href="index.html" aria-current="page">Contact</a></li>
+                <li><a href="../deepseek_/index.html">Chat Robot</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main">
+        <h1>Contact Information</h1>
+        <div class="contact-info">
+            <p>Email: <a href="mailto:cui.ta@northeastern.edu">cui.ta@northeastern.edu</a></p>
+            <p>Email: <a href="mailto:taiwei293@gmail.com">taiwei293@gmail.com</a></p>
+            <p>Phone: <a href="tel:+14085935186">408&#8209;593&#8209;5186</a></p>
+            <p>GitHub: <a href="https://github.com/Ctwqk">github.com/Ctwqk</a></p>
+        </div>
+        <section class="wechat" aria-labelledby="wechat-heading">
+            <h2 id="wechat-heading">WeChat</h2>
+            <p>Scan the QR code below to connect on WeChat:</p>
+            <img src="wechat_QR.jpg" alt="WeChat QR code for Taiwei Cui" width="220" height="238">
+        </section>
+    </main>
 </body>
 </html>

@@ -3,133 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Projects</title>
-    <style>
-        /* 页面整体样式 */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            text-align: center;
-            color: #333;
-        }
-
-        h1 {
-            margin: 20px 0;
-            font-size: 2.5rem;
-        }
-
-        /* 项目卡片样式 */
-        .project-card {
-            display: inline-block;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            margin: 20px;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .project-card video {
-            width: 100%;
-            height: auto;
-        }
-
-        .project-card img {
-            width: 100%;
-            height: auto;
-        }
-
-        .project-details {
-            padding: 15px;
-        }
-
-        .project-details h2 {
-            margin: 10px 0;
-            font-size: 1.5rem;
-        }
-
-        .project-links a {
-            display: inline-block;
-            margin: 10px;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #ffffff;
-            background-color: #0078ff;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-
-        .project-links a:hover {
-            background-color: #005bb5;
-        }
-    </style>
+    <meta name="description" content="Selected projects by Taiwei Cui: computer graphics, computer vision, data mining and full-stack work.">
+    <title>Projects | Taiwei Cui</title>
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../assets/site.css">
 </head>
 <body>
-    <h1>My Projects</h1>
+    <header class="site-header">
+        <a class="skip-link" href="#main">Skip to content</a>
+        <nav aria-label="Main">
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../aboutme/resume.html">CV</a></li>
+                <li><a href="index.html" aria-current="page">Projects</a></li>
+                <li><a href="../publications/index.html">Publications</a></li>
+                <li><a href="../contact/index.html">Contact</a></li>
+                <li><a href="../deepseek_/index.html">Chat Robot</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <!-- 项目卡片 -->
-    <!-- <div class="project-card">
-        <img src="project1.jpg" alt="Project 1 Image">
-        <div class="project-details">
-            <h2>Online Shopping</h2>
-            <p>This is a project about online shopping and take out!</p>
-            <p>Java, Mysql, SpringBoot, Docker, Redis, Nginx</p>
-            <div class="project-links">
-                <a href="https://github.com/Ctwqk/onlineShopping/tree/taiwei" target="_blank">GitHub</a>
-                <a href="dist/index.html" target="_blank">Live Demo</a>
-            </div>
-            
+    <main id="main">
+        <h1>My Projects</h1>
+
+        <div class="project-grid">
+            <article class="project-card">
+                <video controls preload="none" playsinline poster="media/tile-the-space.jpg"
+                       aria-label="Screen recording of the Tile the space application showing a tiled bird pattern">
+                    <source src="media/tile-the-space.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="project-details">
+                    <h2>Tile the space</h2>
+                    <p>Given a piece of tile, can you tile the space? (I can if you label the cone points for me)</p>
+                    <p class="stack">C++, OpenCV, Eigen, ImGui</p>
+                    <div class="project-links">
+                        <a class="button" href="https://github.com/Ctwqk/TIleThePlain" aria-label="Tile the space on GitHub">GitHub</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <video controls preload="none" playsinline poster="media/opencv-snake-game.jpg"
+                       aria-label="Screen recording of a 3D snake game drawn over a live camera view of a checkerboard">
+                    <source src="media/opencv-snake-game.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="project-details">
+                    <h2>OpenCV course codes</h2>
+                    <p>OpenCV code from the spring 2024 course. The final project is a 3D snake game that is anchored to a camera-tracked checkerboard.</p>
+                    <p class="stack">C++, OpenCV</p>
+                    <div class="project-links">
+                        <a class="button" href="https://github.com/Ctwqk/cvCodes" aria-label="OpenCV course codes on GitHub">GitHub</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-details">
+                    <h2>Evaluate your flight</h2>
+                    <p>People rate airlines on different metrics (in their own words). How can flights be evaluated fairly?</p>
+                    <p class="stack">Python, LSTM, Span-ASTE</p>
+                    <div class="project-links">
+                        <a class="button" href="https://github.com/Ctwqk/datamining" aria-label="Evaluate your flight on GitHub">GitHub</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-details">
+                    <h2>Online shopping</h2>
+                    <p>An online shopping and take-out platform.</p>
+                    <p class="stack">Java, MySQL, Spring Boot, Docker, Redis, Nginx</p>
+                    <div class="project-links">
+                        <a class="button" href="https://github.com/Ctwqk/onlineShopping/tree/taiwei" aria-label="Online shopping on GitHub">GitHub</a>
+                    </div>
+                </div>
+            </article>
         </div>
-    </div> -->
-
-    <div class="project-card">
-        <video controls>
-            <source src="./Screencast from 01-24-2025 12:50:51 PM.webm" type="video/webm">
-            Your browser does not support the video tag.
-        </video>
-        <div class="project-details">
-            <h2>Tile the space</h2>
-            <p>Given a piece of tile, can you tile the space? (I can if you label the cone points for me)</p>
-            <p>C++, OpenCV, Eigen, IMGui</p>
-            <div class="project-links">
-                <a href="https://github.com/Ctwqk/TIleThePlain.git" target="_blank">GitHub</a>
-                <!--<a href="https://example.com/demo2" target="_blank">Live Demo</a>-->
-            </div>
-        </div>
-    </div>
-
-    <div class="project-card">
-        <video controls>
-            <source src="./demo_video_1.webm" type="video/webm">
-            Your browser does not support the video tag.
-        </video>
-        <div class="project-details">
-            <h2>OpenCv Course Codes</h2>
-            <p>OpenCV codes in 2024 spring, the final project is a 3D snake game! Its exciting!</p>
-            <p>C++, OpenCV</p>
-            <div class="project-links">
-                <a href="git@github.com:Ctwqk/cvCodes.git" target="_blank">GitHub</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="project-card">
-        <img src="project3.jpg" alt="Project 3 Image">
-        <div class="project-details">
-            <h2>Evaluate Your Flight</h2>
-            <p>People rate the flight companies in different metrics(Their mind), how to evaluate flight fairly?</p>
-            <p>Python, LSTM, Span-ASTE</p>
-            <div class="project-links">
-                <a href="https://github.com/Ctwqk/datamining.git" target="_blank">GitHub</a>
-                <!--<a href="dist/index.html" target="_blank">Live Demo</a>-->
-            </div>
-            
-        </div>
-    </div>
-
+    </main>
 </body>
 </html>

@@ -3,91 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal site of Taiwei Cui: projects, CV, publications and a small self-hosted chatbot demo.">
     <title>Taiwei Cui</title>
-    <style>
-        h1 {
-            text-align: center; /* 文本居中 */
-        }
-        nav {
-            text-align: center; /* 居中导航栏 */
-            background-color: #f8f8f8;
-            padding: 10px 0;
-        }
-        nav ul {
-            margin: 0;
-            padding: 0;
-            list-style: none; /* 去掉列表样式 */
-        }
-        nav ul li {
-            display: inline-block; /* 水平排列 */
-            margin: 0 15px;
-        }
-        nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-size: 16px;
-        }
-        nav ul li a:hover {
-            color: #0078ff; /* 悬浮效果 */
-        }
-        .container {
-            display: flex;
-            justify-content: center; /* 居中整个内容 */
-            gap: 20px; /* 左中右之间的间隔 */
-            margin: 20px auto;
-            max-width: 1200px;
-        }
-        .side-images {
-            display: flex;
-            flex-direction: column; /* 竖直排列 */
-            align-items: center;
-            gap: 15px; /* 图片之间的间隔 */
-        }
-        .side-images img {
-            width: 50px; /* 图片大小 */
-            height: 50px;
-        }
-        .content {
-            flex-grow: 1; /* 中间内容占据剩余空间 */
-            text-align: center;
-        }
-    </style>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
-    <h1> </h1>
-    <nav>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="aboutme/resume.html">CV</a></li>
-            <li><a href="projects/index.html">Projects</a></li>
-            <!-- <li><a href="publications/index.html">Publications</a></li> -->
-            <li><a href="contact/index.html">Contact</a></li>
-            <li><a href="deepseek_/index.html">Chat Robot</a></li>
-            <!-- <li><a href="aboutme/mylife.html">My life</a></li> -->
-        </ul>
-    </nav>
-    <div class="container">
-        <!-- 左侧图片 -->
-        <!-- <div class="side-images">
-            <img src="image1.png" alt="Left Image">
-            <img src="image2.png" alt="Left Image">
-            <img src="image3.png" alt="Left Image">
-        </div> -->
+    <header class="site-header">
+        <a class="skip-link" href="#main">Skip to content</a>
+        <nav aria-label="Main">
+            <ul>
+                <li><a href="index.html" aria-current="page">Home</a></li>
+                <li><a href="aboutme/resume.html">CV</a></li>
+                <li><a href="projects/index.html">Projects</a></li>
+                <li><a href="publications/index.html">Publications</a></li>
+                <li><a href="contact/index.html">Contact</a></li>
+                <li><a href="deepseek_/index.html">Chat Robot</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <!-- 中间内容 -->
-        <div class="content">
+    <main id="main">
+        <section class="hero">
             <h1>Taiwei Cui</h1>
-            <p>Is M.S. CS in Northeastern University</p>
-            <p>Was B.S. CS in Nanjing Agricultural University</p>
-            <p>Looking for intern or fulltime</p>
-        </div>
+            <p>M.S. in Computer Science, Northeastern University</p>
+            <p>B.S. in Computer Science, Nanjing Agricultural University</p>
+            <p>Looking for an internship or a full-time role.</p>
+            <div class="cta">
+                <a class="button" href="projects/index.html">See my projects</a>
+                <a class="button secondary" href="aboutme/resume.html">Read my CV</a>
+                <a class="button secondary" href="contact/index.html">Get in touch</a>
+            </div>
+        </section>
+    </main>
 
-        <!-- 右侧图片 -->
-        <!-- <div class="side-images">
-            <img src="image4.png" alt="Right Image">
-            <img src="image5.png" alt="Right Image">
-            <img src="image6.png" alt="Right Image">
-        </div> -->
-    </div>
+    <footer class="site-footer">
+        <p><a href="https://github.com/Ctwqk">github.com/Ctwqk</a></p>
+    </footer>
 </body>
 </html>

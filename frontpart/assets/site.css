@@ -1,0 +1,161 @@
+/* Shared styles for the static pages (home, projects, contact, CV, publications). */
+:root {
+  --bg: #f6f7f9;
+  --fg: #1f2328;
+  --muted: #4b5563;
+  --accent: #0057b8;
+  --accent-dark: #003f87;
+  --card: #ffffff;
+  --border: #dde1e6;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.55;
+}
+
+a { color: var(--accent); }
+a:hover { color: var(--accent-dark); }
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid #ff9f1a;
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  z-index: 10;
+}
+.skip-link:focus { left: 0; color: #fff; }
+
+/* Navigation */
+.site-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.site-header ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.5rem;
+  margin: 0;
+  padding: 0.5rem;
+  list-style: none;
+}
+.site-header a {
+  display: block;
+  padding: 0.65rem 0.9rem;
+  color: #1f2328;
+  text-decoration: none;
+  border-radius: 6px;
+}
+.site-header a:hover { background: #eaf1fb; color: var(--accent-dark); }
+.site-header a[aria-current="page"] {
+  color: var(--accent-dark);
+  font-weight: 700;
+  box-shadow: inset 0 -3px 0 var(--accent);
+  border-radius: 6px 6px 0 0;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+main > h1 { text-align: center; font-size: clamp(1.8rem, 5vw, 2.5rem); margin: 1rem 0 1.5rem; }
+
+.site-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 1.5rem 1rem 2rem;
+}
+
+/* Home */
+.hero { text-align: center; padding: 2.5rem 0 1rem; }
+.hero h1 { font-size: clamp(2.2rem, 7vw, 3.5rem); margin: 0 0 0.5rem; }
+.hero p { margin: 0.25rem 0; font-size: 1.15rem; color: var(--muted); }
+.hero .cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.75rem; }
+
+.button {
+  display: inline-block;
+  padding: 0.65rem 1.1rem;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.button:hover { background: var(--accent-dark); color: #fff; }
+.button.secondary { background: #fff; color: var(--accent-dark); border: 1px solid var(--accent); }
+.button.secondary:hover { background: #eaf1fb; color: var(--accent-dark); }
+
+/* Projects */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+.project-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.project-card video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #000; }
+.project-details { padding: 1rem 1.25rem 1.25rem; }
+.project-details h2 { margin: 0 0 0.5rem; font-size: 1.35rem; }
+.project-details p { margin: 0.4rem 0; }
+.project-details .stack { color: var(--muted); font-size: 0.95rem; }
+.project-links { margin-top: 0.9rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* Contact */
+.contact-info { max-width: 600px; margin: 0 auto; text-align: center; }
+.contact-info p { font-size: 1.1rem; margin: 0.6rem 0; }
+.contact-info a { font-weight: 700; }
+.wechat { text-align: center; margin-top: 2rem; }
+.wechat img { max-width: min(100%, 220px); height: auto; border: 1px solid var(--border); border-radius: 6px; }
+
+/* CV viewer */
+.cv-actions { text-align: center; margin-bottom: 1rem; }
+.cv-frame {
+  width: 100%;
+  height: min(85vh, 1100px);
+  min-height: 420px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* Publications */
+.publications { list-style: none; padding: 0; max-width: 760px; margin: 0 auto; }
+.publications li {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+.publications .title { font-weight: 700; display: block; }
+.publications .meta { color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
