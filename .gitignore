@@ -34,6 +34,11 @@ Thumbs.db
 
 # Private or large assets that are intentionally not published
 frontpart/images/
+frontpart/index.nginx-debian.html
+frontpart/apache2.html
+frontpart/deepseek_/C2.jpg
+frontpart/deepseek_/RC.jpg
+frontpart/deepseek_/bak
 frontpart/publications/*.pdf
 frontpart/publications/*.docx
 *.docx
