@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local runtime data (SQLite chat DB and uploaded images)
+backpart/DeepSeek/data/
+*.db
+*.sqlite3
+deepseek_media/
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+
+# Node tooling (HTML lint, Playwright)
+node_modules/
+
+# Build outputs and source maps
+dist/
+*.map
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Private or large assets that are intentionally not published
+frontpart/images/
+frontpart/publications/*.pdf
+frontpart/publications/*.docx
+*.docx
