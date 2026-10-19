@@ -1,342 +1,453 @@
-let currentSessionId = null;
-let conversationHistory = [{role: "user", content: null, images: null}];
-let conversationToShow = [];
-let imageHistory = [];
+/*
+ * Chat page. Talks to two endpoints served by backpart/DeepSeek/server.py:
+ *   /deepseek_backend/*  sessions, history and image uploads (SQLite)
+ *   /deepseek/api/*      LLM proxy (model list, streaming chat, one-shot generate)
+ * Pure helpers live in chat-render.js.
+ */
+(function () {
+  "use strict";
 
-document.getElementById('toggleSidebar').addEventListener('click', function() {
-  const sidebar = document.getElementById('sidebar');
-  const main = document.getElementById('main');
-  if (!sidebar.classList.contains('hidden')) {
-    setTimeout(() => {
-      sidebar.classList.remove('slide-right');
-      sidebar.classList.add('hidden');
-      this.style.transform = "translateX(-210px)";
-      main.classList.add('expanded');
-    });
-  } else {
-    sidebar.classList.remove('hidden');
-    sidebar.classList.add('slide-right');
-    this.style.transform = "translateX(20px)";
-    setTimeout(() => {
-      sidebar.classList.remove('slide-right');
-      this.style.transform = "";
-      main.classList.remove('expanded');
-    });
-  }
-});
+  const R = window.ChatRender;
+  const metaRoot = document.querySelector('meta[name="chat-api-root"]');
+  const API_ROOT = ((metaRoot && metaRoot.content) || "").replace(/\/$/, "");
+  const BACKEND = API_ROOT + "/deepseek_backend";
+  const LLM_API = API_ROOT + "/deepseek/api";
 
-// Upload image button triggers file selection
-document.getElementById("uploadButton").addEventListener("click", function() {
-  document.getElementById("imageUpload").click();
-});
+  const DEFAULT_TITLE = "New Chat";
+  const MAX_IMAGES = 4;
+  const CONTEXT_MESSAGES = 10; // how many past messages are sent to the model
+  const NARROW = window.matchMedia("(max-width: 720px)");
 
-// When a file is selected, upload it
-document.getElementById("imageUpload").addEventListener("change", async function() {
-  if (this.files && this.files[0]) {
-    const file = this.files[0];
-    // const imageUrl = await uploadImage(file);
-    const formData = new FormData();
-    formData.append("image", file);
-    const response = await fetch(`/deepseek_backend/get_base64/${currentSessionId}`, {
-      method: "POST",
-      body: formData
-    });
-    const data = await response.json();
-    const imageBase64 = data.imageBase64;
-    const imageUrl = data.url;
-    if (imageBase64) {
-      // console.log(imageBase64);
-      const chatbox = document.getElementById("chatbox");
-      chatbox.innerHTML += `
-        <div>
-            <img src="data:image/png;base64,${imageBase64}" 
-                alt="Uploaded Image" 
-                style="max-width:100%;">
-        </div>`;
-      chatbox.scrollTop = chatbox.scrollHeight;
-      // Optionally, add the image message to the conversation history
-      // conversationHistory.push({ role: "user", content: `<img src="${imageUrl}" alt="Uploaded Image">` });
-      // conversationHistory[conversationHistory.length - 1].images.push( `${imageBase64}`);
-      let currentMsg = conversationHistory[conversationHistory.length - 1];
-      if (!currentMsg.images) {
-        // Initialize as an array with the new image
-        currentMsg.images = [imageBase64];
-      } else if (Array.isArray(currentMsg.images)) {
-        // Append new image if already an array
-        currentMsg.images.push(imageBase64);
-      } else {
-        // If somehow it is a single string, convert to array
-        currentMsg.images = [currentMsg.images, imageBase64];
-      }
-    }
-  }
-});
-
-// Function to upload image using FormData
-async function uploadImage(file) {
-  const formData = new FormData();
-  formData.append("image", file);
-  try {
-    // Replace with your actual image upload endpoint
-    const response = await fetch("/deepseek/api/upload_image", {
-      method: "POST",
-      body: formData
-    });
-    if (!response.ok) {
-      throw new Error("Image upload failed");
-    }
-    const data = await response.json();
-    // Assume the response returns an object with an imageUrl property
-    return data.imageUrl;
-  } catch (error) {
-    console.error("Image upload failed:", error);
-    return null;
-  }
-}
-
-async function loadModels() {
-  try {
-    // Replace the URL below with your actual models endpoint
-    const response = await fetch("/deepseek/api/tags");
-    const data = await response.json();
-    const modelNames = data.models.map(model => model.id || model.name);
-    const modelSelect = document.getElementById("modelSelect");
-    modelSelect.innerHTML = "";
-    modelNames.forEach(name => {
-      const option = document.createElement("option");
-      option.value = name;
-      option.text = name;
-      modelSelect.appendChild(option);
-    });
-  } catch (error) {
-    console.error("Error loading models:", error);
-  }
-}
-
-async function createSession(){
-  const response = await fetch("/deepseek_backend/create_session", {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_name: "New Chat" })
-  });
-  const session = await response.json();
-  currentSessionId = session.session_id;
-  addSessionToList(session);
-  document.getElementById("chatbox").innerHTML = "";
-}
-
-function addSessionToList(session) {
-  const sessionList = document.getElementById("session-list");
-  const container = document.createElement("div");
-  container.classList.add("session-container");
-  container.setAttribute("data-session-id", session.session_id);
-  container.onclick = () => switchSession(session.session_id);
-  const nameSpan = document.createElement("span");
-  nameSpan.classList.add("session-name");
-  nameSpan.innerText = session.session_name;
-  const deleteButton = document.createElement("button");
-  deleteButton.classList.add("delete-button");
-  deleteButton.innerText = "Delete";
-  deleteButton.onclick = (e) => {
-    e.stopPropagation();
-    deleteSession(session.session_id);
-    container.remove();
+  const el = {
+    toggle: document.getElementById("toggleSidebar"),
+    sidebar: document.getElementById("sidebar"),
+    newSession: document.getElementById("newSession"),
+    sessionList: document.getElementById("session-list"),
+    model: document.getElementById("modelSelect"),
+    status: document.getElementById("status"),
+    chatbox: document.getElementById("chatbox"),
+    attachments: document.getElementById("attachments"),
+    form: document.getElementById("input-area"),
+    input: document.getElementById("userInput"),
+    upload: document.getElementById("uploadButton"),
+    send: document.getElementById("sendButton"),
+    file: document.getElementById("imageUpload"),
   };
-  container.appendChild(nameSpan);
-  container.appendChild(deleteButton);
-  sessionList.appendChild(container);
-}
 
-async function loadSessions(){
-  const response = await fetch("/deepseek_backend/get_session");
-  const sessions = await response.json();
-  const sessionList = document.getElementById("session-list");
-  sessionList.innerHTML = "";
-  sessions.forEach(session => {
-    addSessionToList(session);
-  });
-}
+  let currentSessionId = null;
+  let history = []; // [{role, content, images: string[]}] for the active session
+  let pendingImages = []; // base64 strings attached to the message being composed
+  let busy = false;
+  const sessionNames = new Map(); // id -> title currently shown
 
-async function switchSession(sessionId) {
-  currentSessionId = sessionId;
-  await loadChatHistory(sessionId);
-}
+  // ---------------------------------------------------------------- helpers
 
-async function deleteSession(sessionId = null){
-  const idToDelete = sessionId ? sessionId : currentSessionId;
-  await fetch('/deepseek_backend/delete_session', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ session_id: idToDelete })
-  });
-  loadSessions();
-}
-
-async function loadChatHistory(sessionId){
-  const response = await fetch(`/deepseek_backend/load_chat/${sessionId}`);
-  let messages = await response.json();
-  const chatbox = document.getElementById("chatbox");
-  chatbox.innerHTML = "";
-  messages = messages.reverse();
-  messages.forEach(msg => {
-    chatbox.innerHTML += `<div><strong>${msg.role === "user" ? "You" : "Robot"}:</strong> ${msg.content}</div>`;
-    if (msg.images) {
-      const imageArray = msg.images.split(',');
-      imageArray.forEach(imageBase64 => {
-        if (imageBase64.trim() !== "") {
-          chatbox.innerHTML += `
-            <div>
-              <img src="data:image/png;base64,${imageBase64.trim()}" alt="Uploaded Image" style="max-width:100%;">
-            </div>`;
-        }
-      });
+  async function api(url, options) {
+    const resp = await fetch(url, options);
+    let data = null;
+    try {
+      data = await resp.json();
+    } catch (e) {
+      /* non-JSON body */
     }
-    //  console.log(msg.images);
-  });
-  conversationHistory = messages;
-  conversationHistory.push({role: "user", content: null, images: null});
-  chatbox.scrollTop = chatbox.scrollHeight;
-  let newSessionName = await computeSessionName(messages);
-  updateSessionName(sessionId, newSessionName);
-}
-
-async function computeSessionName(messages) {
-  if (messages.length > 0) {
-    for (let msg of messages) {
-      if (msg.content && msg.content.trim() !== "") {
-        const response = await fetch('/deepseek/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: "deepseek-llm:7b",
-            prompt: `Summarize the following content in no more than 10 words, less is better:\n\n${msg.content}`,
-            stream: false
-          })
-        });
-        const data = await response.json();
-        return data.response;
-      }
+    if (!resp.ok) {
+      throw new Error((data && data.error) || "Request failed (HTTP " + resp.status + ")");
     }
+    return data;
   }
-  return "New Chat";
-}
 
-function updateSessionName(sessionId, newName) {
-  const sessionList = document.getElementById("session-list");
-  const container = sessionList.querySelector(`[data-session-id="${sessionId}"]`);
-  if (container) {
-    const nameSpan = container.querySelector(".session-name");
-    if (nameSpan) {
-      nameSpan.innerText = newName;
-    }
-  }
-}
-
-function formatThinkText(text) {
-  return text.replace(/<think>([\s\S]*?)<\/think>/g, '<span class="think-text">$1</span>');
-}
-
-async function sendMessage() {
-  if (!currentSessionId) {
-    alert("Please select or create a session first.");
-    return;
-  }
-  const userInputElem = document.getElementById('userInput');
-  const userInput = userInputElem.value;
-  const chatbox = document.getElementById('chatbox');
-
-  chatbox.innerHTML += `<div><strong>You:</strong> ${userInput}</div>`;
-  chatbox.scrollTop = chatbox.scrollHeight;
-  
-  // conversationHistory.push({ role: "user", content: userInput, images: imageHistory[ElementInternals.length - 1] });
-  conversationHistory[conversationHistory.length - 1].content = userInput;
-  conversationHistory.push({ role: "assistant", content: null, images: null });
-  const recentHistory = JSON.parse(JSON.stringify(conversationHistory.slice(-10)));
-  recentHistory.forEach(item => {
-    if (item.images && !Array.isArray(item.images)) {
-      item.images = [item.images];
-    }
-  });
-  // Use the selected model from the dropdown
-  const selectedModel = document.getElementById("modelSelect").value;
-  // console.log(selectedModel);
-
-  const responseDiv = document.createElement("div");
-  responseDiv.innerHTML = `<strong>Robot:</strong> <span class="streaming-response"></span>`;
-  chatbox.appendChild(responseDiv);
-  chatbox.scrollTop = chatbox.scrollHeight;
-
-  try {
-    const response = await fetch('/deepseek/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: selectedModel,
-        messages: recentHistory,
-        stream: true
-      })
-    });
-
-    if (!response.body) throw new Error("No response body from server.");
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let accumulatedResponse = "";
-    let buffer = "";
-    const responseSpan = document.querySelectorAll(".streaming-response");
-    const latestResponseSpan = responseSpan[responseSpan.length - 1];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      let boundary = buffer.indexOf("\n");
-      while (boundary !== -1) {
-        let jsonChunk = buffer.slice(0, boundary).trim();
-        buffer = buffer.slice(boundary + 1);
-        boundary = buffer.indexOf("\n");
-        if (jsonChunk) {
-          try {
-            const parsedChunk = JSON.parse(jsonChunk);
-            if (parsedChunk.message && parsedChunk.message.content) {
-              let chunkText = parsedChunk.message.content;
-              chunkText = formatThinkText(chunkText);
-              accumulatedResponse += chunkText;
-              latestResponseSpan.innerHTML = accumulatedResponse;
-              chatbox.scrollTop = chatbox.scrollHeight;
-            }
-          } catch (e) {
-            console.error("Error parsing chunk:", e);
-          }
-        }
-      }
-    }
-    conversationHistory[conversationHistory.length - 1].content = accumulatedResponse;
-    const imagesToSave = conversationHistory[conversationHistory.length - 2].images;
-    const imagesString = Array.isArray(imagesToSave) ? imagesToSave.join(',') : imagesToSave;
-   
-    await fetch("/deepseek_backend/save_chat", {
+  function postJson(url, body) {
+    return api(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        session_id: currentSessionId,
-        user: userInput,
-        assistant: accumulatedResponse,
-        images: imagesString
-      })
+      body: JSON.stringify(body),
     });
-  } catch (error) {
-    chatbox.innerHTML += `<div><strong>Error:</strong> ${error.message}</div>`;
   }
-  userInputElem.value = '';
-  console.log(conversationHistory[conversationHistory.length - 2].images);
-  conversationHistory.push({role: "user", content: null, images: null});
-}
 
-window.onload = function(){
-  loadSessions();
-  loadModels();
-  if(currentSessionId){
-    loadChatHistory(currentSessionId);
+  function showStatus(message, kind) {
+    el.status.textContent = message;
+    el.status.className = kind || "info";
+    el.status.hidden = !message;
   }
-};
+
+  function scrollToEnd() {
+    el.chatbox.scrollTop = el.chatbox.scrollHeight;
+  }
+
+  function setBusy(value) {
+    busy = value;
+    el.send.disabled = value;
+    el.send.textContent = value ? "Sending…" : "Send";
+  }
+
+  // ---------------------------------------------------------------- sidebar
+
+  function setSidebar(open) {
+    document.body.classList.toggle("sidebar-collapsed", !open);
+    el.toggle.setAttribute("aria-expanded", String(open));
+  }
+
+  el.toggle.addEventListener("click", function () {
+    setSidebar(document.body.classList.contains("sidebar-collapsed"));
+  });
+
+  // ---------------------------------------------------------------- sessions
+
+  function markActiveSession() {
+    el.sessionList.querySelectorAll(".session-container").forEach(function (node) {
+      const active = Number(node.dataset.sessionId) === currentSessionId;
+      node.classList.toggle("active", active);
+      const name = node.querySelector(".session-name");
+      if (active) name.setAttribute("aria-current", "true");
+      else name.removeAttribute("aria-current");
+    });
+  }
+
+  function addSessionToList(session, prepend) {
+    sessionNames.set(session.session_id, session.session_name);
+    const container = document.createElement("div");
+    container.className = "session-container";
+    container.dataset.sessionId = session.session_id;
+
+    const nameButton = document.createElement("button");
+    nameButton.type = "button";
+    nameButton.className = "session-name";
+    nameButton.textContent = session.session_name;
+    nameButton.addEventListener("click", function () {
+      switchSession(session.session_id);
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "delete-button";
+    deleteButton.textContent = "Delete";
+    deleteButton.setAttribute("aria-label", "Delete session " + session.session_name);
+    deleteButton.addEventListener("click", function () {
+      deleteSession(session.session_id);
+    });
+
+    container.append(nameButton, deleteButton);
+    if (prepend) el.sessionList.prepend(container);
+    else el.sessionList.append(container);
+  }
+
+  async function loadSessions() {
+    const sessions = await api(BACKEND + "/get_session");
+    el.sessionList.replaceChildren();
+    sessions.forEach(function (s) {
+      addSessionToList(s, false);
+    });
+    markActiveSession();
+  }
+
+  async function createSession() {
+    const session = await postJson(BACKEND + "/create_session", { session_name: DEFAULT_TITLE });
+    currentSessionId = session.session_id;
+    history = [];
+    pendingImages = [];
+    renderAttachments();
+    el.chatbox.replaceChildren();
+    addSessionToList({ session_id: session.session_id, session_name: session.session_name || DEFAULT_TITLE }, true);
+    markActiveSession();
+    return session;
+  }
+
+  async function ensureSession() {
+    if (currentSessionId === null) await createSession();
+  }
+
+  async function switchSession(sessionId) {
+    currentSessionId = sessionId;
+    markActiveSession();
+    pendingImages = [];
+    renderAttachments();
+    try {
+      const messages = await api(BACKEND + "/load_chat/" + sessionId);
+      history = messages.map(function (m) {
+        return { role: m.role, content: m.content || "", images: R.imagesFromField(m.images) };
+      });
+      el.chatbox.replaceChildren();
+      history.forEach(function (m) {
+        appendMessage(m.role, m.content, m.images);
+      });
+      showStatus("");
+    } catch (e) {
+      showStatus("Could not load this session: " + e.message, "error");
+    }
+    if (NARROW.matches) setSidebar(false);
+  }
+
+  async function deleteSession(sessionId) {
+    try {
+      await postJson(BACKEND + "/delete_session", { session_id: sessionId });
+    } catch (e) {
+      showStatus("Could not delete the session: " + e.message, "error");
+      return;
+    }
+    sessionNames.delete(sessionId);
+    if (sessionId === currentSessionId) {
+      currentSessionId = null;
+      history = [];
+      el.chatbox.replaceChildren();
+    }
+    await loadSessions();
+  }
+
+  function updateSessionName(sessionId, name) {
+    sessionNames.set(sessionId, name);
+    const node = el.sessionList.querySelector('[data-session-id="' + sessionId + '"]');
+    if (!node) return;
+    node.querySelector(".session-name").textContent = name;
+    node.querySelector(".delete-button").setAttribute("aria-label", "Delete session " + name);
+  }
+
+  // First message of a session -> short title (model-generated, or the first words as a fallback).
+  async function titleSession(sessionId, firstMessage, model) {
+    if (sessionNames.get(sessionId) !== DEFAULT_TITLE) return;
+    sessionNames.set(sessionId, "…"); // claim it so concurrent sends do not title twice
+    let title = R.shortTitle(firstMessage, 40);
+    if (firstMessage.trim()) {
+      try {
+        const out = await postJson(LLM_API + "/generate", {
+          model: model || undefined,
+          prompt: "Summarize the following content in no more than 10 words, less is better:\n\n" + firstMessage,
+          stream: false,
+        });
+        const generated = R.cleanTitle(out.response, 60);
+        if (generated.length >= 3) title = generated; // tiny models sometimes answer with one or two letters
+      } catch (e) {
+        /* keep the fallback title */
+      }
+    }
+    try {
+      await postJson(BACKEND + "/rename_session", { session_id: sessionId, session_name: title });
+      updateSessionName(sessionId, title);
+    } catch (e) {
+      sessionNames.set(sessionId, DEFAULT_TITLE);
+    }
+  }
+
+  // ---------------------------------------------------------------- messages
+
+  function appendMessage(role, text, images) {
+    const row = document.createElement("div");
+    row.className = "message " + role;
+    const label = document.createElement("strong");
+    label.textContent = role === "user" ? "You:" : role === "error" ? "Error:" : "Robot:";
+    const body = document.createElement("span");
+    body.className = "body";
+    if (role === "assistant") body.innerHTML = R.renderModelText(text); // escaped by renderModelText
+    else body.textContent = text;
+    row.append(label, " ", body);
+    (images || []).forEach(function (b64, i) {
+      const img = document.createElement("img");
+      img.className = "chat-image";
+      img.src = R.dataUri(b64);
+      img.alt = "Attached image " + (i + 1);
+      row.append(img);
+    });
+    el.chatbox.append(row);
+    scrollToEnd();
+    return body;
+  }
+
+  function renderAttachments() {
+    el.attachments.replaceChildren();
+    el.attachments.hidden = pendingImages.length === 0;
+    pendingImages.forEach(function (b64, i) {
+      const item = document.createElement("span");
+      item.className = "attachment";
+      const img = document.createElement("img");
+      img.src = R.dataUri(b64);
+      img.alt = "Attached image " + (i + 1);
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "×";
+      remove.setAttribute("aria-label", "Remove attached image " + (i + 1));
+      remove.addEventListener("click", function () {
+        pendingImages.splice(i, 1);
+        renderAttachments();
+      });
+      item.append(img, remove);
+      el.attachments.append(item);
+    });
+  }
+
+  async function streamReply(model, outgoing, onText) {
+    const resp = await fetch(LLM_API + "/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: model || undefined, messages: outgoing, stream: true }),
+    });
+    if (!resp.ok) {
+      let message = "Chat request failed (HTTP " + resp.status + ")";
+      try {
+        message = (await resp.json()).error || message;
+      } catch (e) {
+        /* keep generic message */
+      }
+      throw new Error(message);
+    }
+    if (!resp.body) throw new Error("No response body from server.");
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    const splitter = R.createLineSplitter();
+    let text = "";
+    function handle(line) {
+      const chunk = R.parseStreamLine(line);
+      if (!chunk) return;
+      if (chunk.error) throw new Error(chunk.error);
+      if (chunk.message && chunk.message.content) {
+        text += chunk.message.content;
+        onText(text);
+      }
+    }
+    for (;;) {
+      const step = await reader.read();
+      if (step.done) break;
+      splitter.push(decoder.decode(step.value, { stream: true })).forEach(handle);
+    }
+    splitter.flush().forEach(handle);
+    return text;
+  }
+
+  async function sendMessage() {
+    if (busy) return;
+    const text = el.input.value.trim();
+    if (!text && pendingImages.length === 0) return;
+    try {
+      await ensureSession();
+    } catch (e) {
+      showStatus("Could not start a session: " + e.message, "error");
+      return;
+    }
+
+    setBusy(true);
+    showStatus("");
+    const sessionId = currentSessionId;
+    const images = pendingImages.slice();
+    const model = el.model.value;
+    const outgoing = history
+      .slice(-CONTEXT_MESSAGES)
+      .concat([{ role: "user", content: text, images: images }]);
+
+    appendMessage("user", text, images);
+    el.input.value = "";
+    pendingImages = [];
+    renderAttachments();
+
+    const botBody = appendMessage("assistant", "");
+    let reply = "";
+    try {
+      reply = await streamReply(model, outgoing, function (partial) {
+        reply = partial;
+        botBody.innerHTML = R.renderModelText(partial);
+        scrollToEnd();
+      });
+      if (!reply.trim()) throw new Error("The model returned an empty response.");
+    } catch (e) {
+      if (!reply.trim()) botBody.closest(".message").remove();
+      appendMessage("error", e.message);
+      setBusy(false);
+      el.input.focus();
+      return;
+    }
+
+    history.push({ role: "user", content: text, images: images }, { role: "assistant", content: reply, images: [] });
+    try {
+      await postJson(BACKEND + "/save_chat", {
+        session_id: sessionId,
+        user: text,
+        assistant: reply,
+        images: images,
+      });
+      titleSession(sessionId, text, model);
+    } catch (e) {
+      appendMessage("error", "The reply could not be saved: " + e.message);
+    }
+    setBusy(false);
+    el.input.focus();
+  }
+
+  // ---------------------------------------------------------------- uploads
+
+  el.upload.addEventListener("click", function () {
+    el.file.click();
+  });
+
+  el.file.addEventListener("change", async function () {
+    const file = el.file.files && el.file.files[0];
+    el.file.value = "";
+    if (!file) return;
+    if (pendingImages.length >= MAX_IMAGES) {
+      showStatus("At most " + MAX_IMAGES + " images per message.", "error");
+      return;
+    }
+    try {
+      await ensureSession();
+      const form = new FormData();
+      form.append("image", file);
+      const data = await api(BACKEND + "/get_base64/" + currentSessionId, { method: "POST", body: form });
+      pendingImages.push(data.imageBase64);
+      renderAttachments();
+      showStatus("");
+    } catch (e) {
+      showStatus("Upload failed: " + e.message, "error");
+    }
+  });
+
+  // ---------------------------------------------------------------- models
+
+  async function loadModels() {
+    try {
+      const data = await api(LLM_API + "/tags");
+      const names = data.models.map(function (m) {
+        return m.id || m.name;
+      });
+      el.model.replaceChildren();
+      names.forEach(function (name) {
+        el.model.append(new Option(name, name));
+      });
+      if (data.warning) {
+        showStatus("Could not list models from the LLM server (" + data.warning + "). Using the default model.", "warn");
+      }
+    } catch (e) {
+      el.model.replaceChildren(new Option("No models available", ""));
+      showStatus("Model list unavailable: " + e.message, "warn");
+    }
+  }
+
+  // ---------------------------------------------------------------- wiring
+
+  el.newSession.addEventListener("click", async function () {
+    try {
+      await createSession();
+      if (NARROW.matches) setSidebar(false);
+      el.input.focus();
+    } catch (e) {
+      showStatus("Could not create a session: " + e.message, "error");
+    }
+  });
+
+  el.form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    sendMessage();
+  });
+
+  el.input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      sendMessage();
+    }
+  });
+
+  setSidebar(!NARROW.matches);
+  loadSessions().catch(function (e) {
+    showStatus(
+      "Chat backend not reachable (" + e.message + "). This page needs the Flask server in backpart/DeepSeek; see the README.",
+      "error"
+    );
+  });
+  loadModels();
+})();
