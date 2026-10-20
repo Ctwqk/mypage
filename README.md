@@ -1,6 +1,6 @@
 # mypage
 
-[![CI](https://github.com/Ctwqk/mypage/actions/workflows/ci.yml/badge.svg?branch=portfolio-upgrade)](https://github.com/Ctwqk/mypage/actions/workflows/ci.yml)
+[![CI](https://github.com/Ctwqk/mypage/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Ctwqk/mypage/actions/workflows/ci.yml)
 
 Personal site of Taiwei Cui: a small static portfolio (home, CV, projects, publications, contact) plus a **chat page backed by a Flask + SQLite service** that stores sessions and image attachments and streams answers from any OpenAI-compatible LLM (Ollama, the DeepSeek API, OpenAI, ...).
 
@@ -151,3 +151,9 @@ To regenerate the screenshots, start the server against a throwaway database and
 - Images are stored twice (database and disk). A cleaner design would keep files on disk and reference them from the database.
 - The CV PDF and the personal details on the Contact page are static content that has to be updated by hand.
 - Ideas: a stop button for streaming replies, markdown rendering, per-user sessions, an HTML version of the CV page.
+
+## License
+
+Code is released under the [MIT License](LICENSE).
+
+The MIT license covers the code only. Personal content — the CV, photos, videos, publication PDFs and page text — is © Taiwei Cui, all rights reserved.
