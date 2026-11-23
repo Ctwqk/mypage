@@ -2,6 +2,10 @@ let currentSessionId = null;
 let conversationHistory = [{role: "user", content: null, images: null}];
 let conversationToShow = [];
 let imageHistory = [];
+let mediaRecorder;
+let mediaStream;
+let recordedChunks = [];
+let isRecording = false;
 
 document.getElementById('toggleSidebar').addEventListener('click', function() {
   const sidebar = document.getElementById('sidebar');
@@ -22,6 +26,62 @@ document.getElementById('toggleSidebar').addEventListener('click', function() {
       this.style.transform = "";
       main.classList.remove('expanded');
     });
+  }
+});
+
+
+document.getElementById('recordButton').addEventListener('click', async function() {
+  if (!isRecording) {
+    // Request microphone access and start recording
+    // this.innerHTML = '<i class="fas fa-stop"></i>';
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(mediaStream);
+      recordedChunks = [];
+      mediaRecorder.ondataavailable = event => {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+      mediaRecorder.onstop = async () => {
+        // Create an audio blob from the recorded chunks
+        const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+        // Upload the audio blob to the ASR endpoint
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.webm');
+        try {
+          const response = await fetch("/deepseek_backend/do_asr", {
+            method: "POST",
+            body: formData
+          });
+          if (!response.ok) throw new Error("ASR request failed");
+          const data = await response.json();
+          const transcription = data.transcription;
+          if (transcription) {
+            // Insert the transcription into the input field
+            document.getElementById('userInput').value += transcription;
+          }
+        } catch (err) {
+          console.error("ASR error:", err);
+        }
+        mediaStream.getTracks().forEach(track => track.stop());
+      };
+      mediaRecorder.start();
+      isRecording = true;
+      // Change button icon to indicate recording (e.g., stop icon)
+      console.log("record pressed");
+      this.innerHTML = '<i class="fas fa-stop"></i>';
+    } catch (err) {
+      console.error("Microphone access error:", err);
+    }
+  } else {
+    // Revert button icon to microphone icon
+    mediaRecorder.stop();
+    isRecording = false;
+    this.innerHTML = '<i class="fas fa-microphone"></i>';
+    // Stop recording
+    
+    
   }
 });
 
@@ -73,26 +133,26 @@ document.getElementById("imageUpload").addEventListener("change", async function
 });
 
 // Function to upload image using FormData
-async function uploadImage(file) {
-  const formData = new FormData();
-  formData.append("image", file);
-  try {
-    // Replace with your actual image upload endpoint
-    const response = await fetch("/deepseek/api/upload_image", {
-      method: "POST",
-      body: formData
-    });
-    if (!response.ok) {
-      throw new Error("Image upload failed");
-    }
-    const data = await response.json();
-    // Assume the response returns an object with an imageUrl property
-    return data.imageUrl;
-  } catch (error) {
-    console.error("Image upload failed:", error);
-    return null;
-  }
-}
+// async function uploadImage(file) {
+//   const formData = new FormData();
+//   formData.append("image", file);
+//   try {
+//     // Replace with your actual image upload endpoint
+//     const response = await fetch("/deepseek/api/upload_image", {
+//       method: "POST",
+//       body: formData
+//     });
+//     if (!response.ok) {
+//       throw new Error("Image upload failed");
+//     }
+//     const data = await response.json();
+//     // Assume the response returns an object with an imageUrl property
+//     return data.imageUrl;
+//   } catch (error) {
+//     console.error("Image upload failed:", error);
+//     return null;
+//   }
+// }
 
 async function loadModels() {
   try {

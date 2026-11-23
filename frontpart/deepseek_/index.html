@@ -29,13 +29,18 @@
     <div id="chat-container">
       <div id="chatbox"></div>
       <div id="input-area">
+        <button id="recordButton" title="Record Audio">
+          <i class="fas fa-microphone"></i>
+        </button> 
         <textarea id="userInput" placeholder="Type your message here..." rows="4"></textarea>
+        <!-- Record Audio Button -->
+        
         <!-- Upload Image Button -->
         <button id="uploadButton" title="Upload Image">
           <i class="fas fa-image"></i>
         </button>
         <button id="sendButton" onclick="sendMessage()">Send</button>
-      </div>
+      </div>      
     </div>
   </div>
   <!-- Hidden file input for image upload -->
